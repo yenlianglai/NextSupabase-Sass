@@ -1,0 +1,2 @@
+ALTER TABLE "profile" ALTER COLUMN "id" DROP DEFAULT;--> statement-breakpoint
+ALTER TABLE "profile" ADD CONSTRAINT "profile_id_users_id_fk" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;

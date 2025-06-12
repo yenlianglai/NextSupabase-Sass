@@ -1,0 +1,1 @@
+ALTER TABLE "user_quota" ADD COLUMN "next_billed_at" timestamp;
