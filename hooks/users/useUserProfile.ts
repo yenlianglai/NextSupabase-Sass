@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { UserProfile } from "@/types/userProflie";
+import { UserProfile } from "@/types";
 
 export function useUserProfile() {
   return useQuery<UserProfile, Error>({

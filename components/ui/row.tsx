@@ -15,15 +15,15 @@ export const Row = React.forwardRef<HTMLDivElement, FormRowProps>(
     <div
       ref={ref}
       className={cn(
-        "flex justify-between items-center py-4 border-b last:border-b-0",
+        "flex justify-between items-center py-6 border-b border-border/30 last:border-b-0 transition-colors hover:bg-accent/20",
         className
       )}
       {...props}
     >
-      <span className="flex-1 text-base font-medium text-gray-700 dark:text-gray-300">
+      <div className="flex-1 text-base font-medium text-foreground/80">
         {label}
-      </span>
-      <div className="flex-1 flex items-end justify-end text-base font-semibold text-gray-900 dark:text-gray-100">
+      </div>
+      <div className="flex-1 flex items-end justify-end text-base font-semibold">
         {children}
       </div>
     </div>

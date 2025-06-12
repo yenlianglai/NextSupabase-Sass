@@ -158,7 +158,7 @@ The project includes:
 To generate TypeScript types from your Supabase schema:
 
 ```bash
-supabase gen types typescript --local > types/supabase.ts
+npx supabase gen types typescript --project-id "lwwmvwssdpezpnmzuotm" --schema public > types/database.types.ts
 ```
 
 ## 🔐 Authentication
@@ -177,13 +177,5 @@ The project includes:
 - **Component-based** styling approach
 
 ## 📁 Key Directories
-
-### Environment Variables for Production
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_production_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_production_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_production_service_role_key
-```
 
 ## 🧪 Testing

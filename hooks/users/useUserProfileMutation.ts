@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import { UserProfile } from "@/types/userProflie";
+import { UserProfile } from "@/types";
 
 const handleUpdateUserProfile = async ({
   userName,

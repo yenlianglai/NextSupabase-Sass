@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { UserProfile } from "@/types/userProflie";
+import { UserProfile } from "@/types";
 import {
   Card,
   CardHeader,
@@ -13,19 +13,14 @@ import { Row } from "@/components/ui/row";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useUserProfileMutation } from "@/hooks/users/useUserProfileMutation";
-import { useUserQuota } from "@/hooks/users/useUserQuota";
 
 export default function ProfileContent({
   userProfile,
-  setActiveMenu,
 }: {
   userProfile: UserProfile;
-  setActiveMenu: (menu: string) => void;
 }) {
-  const formattedDate = new Date(userProfile.created_at).toLocaleDateString();
-  const [userName, setUserName] = useState(userProfile.name);
+  const [userName, setUserName] = useState(userProfile.name!);
   const { udpateUserProfile, isUpdating } = useUserProfileMutation();
-  const { isLoading: isUQLoading, data: userQuota } = useUserQuota();
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,91 +32,64 @@ export default function ProfileContent({
   };
 
   return (
-    <React.Fragment>
+    <div className="space-y-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold gradient-text">Profile Settings</h1>
+        <p className="text-muted-foreground mt-2">
+          Manage your account information and preferences
+        </p>
+      </div>
+
       {/* Profile Card */}
-      <form
-        onSubmit={async (e) => await handleSave(e)}
-        className="w-full mx-auto"
-      >
-        <Card className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
-          <CardHeader className="flex-row justify-between items-center mb-4 p-0">
-            <CardTitle className="text-2xl font-semibold text-yellow-500">
-              Profile
+      <form onSubmit={async (e) => await handleSave(e)} className="w-full">
+        <Card className="gradient-card modern-shadow">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-2xl font-semibold flex items-center gap-3">
+              <div className="w-2 h-8 bg-primary rounded-full"></div>
+              Profile Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
-            <Row label="Email">
-              <span className="text-gray-600 dark:text-gray-400">
+          <CardContent className="space-y-6">
+            <Row label="Email Address">
+              <span className="text-foreground/80 font-medium">
                 {userProfile?.email}
               </span>
             </Row>
-            <Row label="Username">
+            <Row label="User Role">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary border border-primary/20">
+                {userProfile?.role}
+              </span>
+            </Row>
+            <Row label="Display Name">
               <Input
                 id="name"
                 type="text"
-                placeholder={userProfile?.name}
+                placeholder={userProfile.name!}
                 required
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
-              ></Input>
+                className="glass-effect border-border/50 focus:border-primary/50"
+              />
             </Row>
           </CardContent>
-          <CardFooter className="p-0 pt-6 justify-end">
+          <CardFooter className="pt-6 flex justify-end">
             <Button
               type="submit"
-              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-2 rounded"
+              className="btn-modern bg-primary text-primary-foreground hover:bg-primary/90 px-8"
               disabled={userName === userProfile.name}
             >
-              {isUpdating ? "Saving..." : "Save"}
+              {isUpdating ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                  Saving...
+                </div>
+              ) : (
+                "Save Changes"
+              )}
             </Button>
           </CardFooter>
         </Card>
       </form>
-
-      {/* Subscription Card */}
-      <Card className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow mt-6">
-        <CardHeader className="flex-row justify-between items-center mb-4 p-0">
-          <CardTitle className="text-2xl font-semibold text-yellow-500">
-            Subscription
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-            Your subscription will be automatically renewed unless you cancel it
-            at least 24 hours before the end of the current period.
-          </p>
-
-          <Row
-            label={
-              <div className="flex gap-5 items-center">
-                {"Current Plan"}
-                <p
-                  onClick={() => setActiveMenu("Pricing")}
-                  className="text-yellow-500 hover:text-yellow-600 text-sm cursor-pointer"
-                >
-                  Upgrade your plan to access more features.
-                </p>
-              </div>
-            }
-          >
-            <span className="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
-              {userProfile.tier?.toLowerCase()}
-            </span>
-          </Row>
-          <Row label="Role">
-            <span className="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
-              {userProfile.role}
-            </span>
-          </Row>
-          <Row label="Used Quota">
-            <span className="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
-              {isUQLoading ? "Loading..." : userQuota?.num_usages} /{" "}
-              {userQuota?.threshold}
-            </span>
-          </Row>
-          <Row label="Renewal Date">{formattedDate}</Row>
-        </CardContent>
-      </Card>
-    </React.Fragment>
+    </div>
   );
 }

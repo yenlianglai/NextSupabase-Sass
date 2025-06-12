@@ -77,18 +77,25 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
+      <Card className="gradient-card modern-shadow">
+        <CardHeader className="text-center pb-6">
+          <CardTitle className="text-3xl font-bold gradient-text">
+            Welcome Back
+          </CardTitle>
+          <CardDescription className="text-muted-foreground mt-2">
+            Sign in to your account to continue
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="email"
+                  className="text-foreground/80 font-medium"
+                >
+                  Email
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -96,16 +103,22 @@ export function LoginForm({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  className="glass-effect border-border/50 focus:border-primary/50"
                 />
               </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label
+                    htmlFor="password"
+                    className="text-foreground/80 font-medium"
+                  >
+                    Password
+                  </Label>
                   <Link
                     href="/auth/forgot-password"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                    className="text-sm text-primary hover:text-primary/80 transition-colors btn-modern"
                   >
-                    Forgot your password?
+                    Forgot password?
                   </Link>
                 </div>
                 <Input
@@ -114,30 +127,70 @@ export function LoginForm({
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="glass-effect border-border/50 focus:border-primary/50"
                 />
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
-              </Button>
             </div>
-            <div className="mt-4 text-center text-sm">
+
+            {error && (
+              <div className="glass-effect border border-destructive/20 bg-destructive/5 p-3 rounded-lg">
+                <p className="text-sm text-destructive">{error}</p>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full btn-modern bg-primary text-primary-foreground hover:bg-primary/90 h-11"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                  Signing in...
+                </div>
+              ) : (
+                "Sign In"
+              )}
+            </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border/50" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              onClick={handleLoginWithGoogle}
+              variant="outline"
+              className="w-full glass-effect border-border/50 hover:bg-accent/50 h-11 btn-modern"
+              disabled={isLoading}
+            >
+              <Image
+                src={googlePng}
+                alt="Google logo"
+                width={20}
+                height={20}
+                className="mr-2"
+              />
+              Sign in with Google
+            </Button>
+
+            <div className="text-center text-sm text-muted-foreground">
               Don&apos;t have an account?{" "}
               <Link
                 href="/auth/sign-up"
-                className="underline underline-offset-4"
+                className="text-primary hover:text-primary/80 font-medium transition-colors btn-modern"
               >
-                Sign up
+                Create account
               </Link>
             </div>
           </form>
-        </CardContent>
-
-        <CardContent className="flex flex-col items-center gap-4">
-          <Button onClick={handleLoginWithGoogle}>
-            <Image src={googlePng} alt="Google logo" width={20}></Image>
-            Sign in with Google
-          </Button>
         </CardContent>
       </Card>
     </div>
