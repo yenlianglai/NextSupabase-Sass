@@ -80,3 +80,4 @@ logs
 # Temporary folders
 tmp/
 temp/
+.env.local
