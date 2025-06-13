@@ -5,7 +5,7 @@ import {
   PaddleOptions,
 } from "@paddle/paddle-node-sdk";
 
-export function getPaddleInstance() {
+export function createPaddle() {
   const paddleOptions: PaddleOptions = {
     environment:
       (process.env.NEXT_PUBLIC_PADDLE_ENV as Environment) ??

@@ -1,8 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { initializePaddle, Paddle } from "@paddle/paddle-js";
-import { Product } from "@/constant/paddle";
+import { Plans } from "./constant";
 import { useUserQuota } from "@/hooks/users/useUserQuota";
+import { useUserQuotaMutation } from "@/hooks/users/useUserQuotaMutation";
+import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -21,53 +23,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const plans = [
-  {
-    id: 0,
-    name: "free",
-    price: "$0",
-    priceUnit: "forever",
-    subtitle: "Perfect for getting started and exploring our platform.",
-    features: [
-      "Limited analytics",
-      "Community forum access",
-      "Basic dashboard",
-      "Up to 5 projects",
-    ],
-    productId: "free-trial",
-  },
-  {
-    id: 1,
-    name: "basic",
-    price: `$${Product.basic.cost}`,
-    priceUnit: "per month",
-    subtitle: "Best for small teams and freelancers.",
-    features: ["Basic analytics", "Community support"],
-    productId: Product.basic.pricdId,
-  },
-  {
-    id: 2,
-    name: "pro",
-    price: `$${Product.pro.cost}`,
-    priceUnit: "per month",
-    subtitle: "Best for growing teams.",
-    features: ["Advanced analytics", "Email support", "Custom reports"],
-    productId: Product.pro.pricdId,
-  },
-  {
-    id: 3,
-    name: "premium",
-    price: `$${Product.premium.cost}`,
-    priceUnit: "per month",
-    subtitle: "Best for large organizations.",
-    features: ["All Pro features", "Dedicated SLA", "Onboarding assistance"],
-    productId: Product.premium.pricdId,
-  },
-];
-
 export default function SubscriptionContent() {
   const [paddle, setPaddle] = useState<Paddle | undefined>(undefined);
   const { data: userQuota } = useUserQuota();
+  const { cancelSubscription, updateSubscription, isCancelling, isUpdating } =
+    useUserQuotaMutation();
 
   useEffect(() => {
     initializePaddle({
@@ -76,20 +36,62 @@ export default function SubscriptionContent() {
     }).then((instance) => setPaddle(instance));
   }, []);
 
-  const handleCheckout = (planProductId: string) => {
-    if (!paddle) {
-      console.error("Paddle not initialized");
+  const handleCancelSubscription = async (subscriptionId?: string) => {
+    if (!subscriptionId && !userQuota?.subscription_id) {
+      toast.error("No subscription ID available");
       return;
     }
+
+    const subId = subscriptionId || userQuota?.subscription_id;
+
+    cancelSubscription({
+      subscriptionId: subId!,
+      effectiveFrom: "immediately",
+    });
+  };
+
+  const handleSubscribe = async (planProductId: string) => {
+    if (userQuota?.tier === "free") {
+      handleCheckout(planProductId);
+      return;
+    } else {
+      // Update existing subscription
+      if (!userQuota?.subscription_id) {
+        toast.error("No subscription ID available for update");
+        return;
+      }
+
+      const newPlan = Plans.find((p) => p.productId === planProductId);
+      const newTier = newPlan?.name?.toLowerCase() || userQuota.tier!;
+
+      updateSubscription({
+        subscriptionId: userQuota.subscription_id,
+        priceId: planProductId,
+        quantity: 1,
+        prorationBillingMode: "prorated_next_billing_period",
+        currentUsage: userQuota.num_usages || 0,
+        newTier: newTier, // Pass the new tier for optimistic updates
+      });
+    }
+  };
+
+  const handleCheckout = (planProductId: string) => {
+    if (!paddle || !userQuota) {
+      toast.error("Payment system not initialized. Please try again.");
+      return;
+    }
+
+    toast.info("Opening checkout...");
+
     paddle.Checkout.open({
       customer: {
-        id: userQuota!.customer_id,
+        id: userQuota!.customer_id!,
       },
       settings: {
         displayMode: "overlay",
         theme: "light",
         locale: "en",
-        successUrl: `${window.location.origin}/protected/`,
+        successUrl: `${window.location.origin}/pricing/`,
       },
       items: [
         {
@@ -120,31 +122,39 @@ export default function SubscriptionContent() {
                 size="sm"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 btn-modern"
               >
-                Annual pricing
+                Monthly pricing
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 className="text-muted-foreground hover:text-foreground hover:bg-accent btn-modern"
               >
-                Monthly pricing
+                Annual pricing
               </Button>
             </div>
           </div>
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {plans.map((plan) => {
+          {Plans.map((plan) => {
             const isCurrent = plan.name
               .toLowerCase()
               .includes(userQuota?.tier?.toLowerCase() || "");
             return (
               <Card
                 key={plan.id}
-                className={`gradient-card interactive-hover ${
+                className={`gradient-card interactive-hover relative ${
                   isCurrent ? "border-primary ring-1 ring-primary/20" : ""
                 }`}
               >
+                {/* Current Plan Badge */}
+                {isCurrent && (
+                  <div className="absolute -top-2 -right-2 z-10">
+                    <div className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+                      Current Plan
+                    </div>
+                  </div>
+                )}
                 <CardHeader className="pb-2 h-1/4">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
@@ -162,7 +172,6 @@ export default function SubscriptionContent() {
                     </div>
                   </div>
                 </CardHeader>
-
                 <CardContent className="py-4 h-2/4">
                   <div className="mb-6">
                     <div className="flex items-baseline mb-2">
@@ -194,35 +203,31 @@ export default function SubscriptionContent() {
                     ))}
                   </ul>
                 </CardContent>
-
-                <CardFooter className="pt-6 h-1/4">
-                  <Button
-                    disabled={isCurrent || !paddle}
-                    onClick={() => {
-                      if (!isCurrent && paddle) {
-                        if (plan.productId === "free-trial") {
-                          console.log("Free plan selected");
-                        } else {
-                          handleCheckout(plan.productId);
-                        }
-                      }
-                    }}
-                    className={`w-full btn-modern ${
-                      isCurrent
-                        ? "bg-muted text-muted-foreground cursor-not-allowed hover:bg-muted"
-                        : plan.productId === "free-trial"
-                        ? "bg-green-600 text-white hover:bg-green-700"
-                        : "bg-primary text-primary-foreground hover:bg-primary/90"
-                    }`}
-                    variant={isCurrent ? "secondary" : "default"}
-                  >
-                    {isCurrent
-                      ? "Current Plan"
-                      : plan.productId === "free-trial"
-                      ? "Start free trial"
-                      : "Get started"}
-                  </Button>
-                </CardFooter>
+                {plan.productId !== "free-trial" && (
+                  <CardFooter className="pt-6 h-1/4">
+                    {isCurrent ? (
+                      <Button
+                        variant="destructive"
+                        className="w-full btn-modern light:bg-red-500 text-white hover:bg-red-600"
+                        onClick={() => handleCancelSubscription()}
+                        disabled={!paddle || isCancelling}
+                      >
+                        {isCancelling ? "Cancelling..." : "Cancel subscription"}
+                      </Button>
+                    ) : (
+                      <Button
+                        disabled={!paddle || isUpdating}
+                        onClick={() => {
+                          handleSubscribe(plan.productId);
+                        }}
+                        className={`w-full btn-modern ${"bg-primary text-primary-foreground hover:bg-green-600/90"}`}
+                        variant="default"
+                      >
+                        {isUpdating ? "Updating..." : "Get started"}
+                      </Button>
+                    )}
+                  </CardFooter>
+                )}
               </Card>
             );
           })}
@@ -239,7 +244,7 @@ export default function SubscriptionContent() {
                 <TableHeader>
                   <TableRow className="border-border hover:bg-transparent">
                     <TableHead className="w-1/5 text-muted-foreground min-w-[120px]"></TableHead>
-                    {plans.map((plan) => {
+                    {Plans.map((plan) => {
                       const isCurrent = plan.name
                         .toLowerCase()
                         .includes(userQuota?.tier?.toLowerCase() || "");
@@ -402,46 +407,50 @@ export default function SubscriptionContent() {
                       </div>
                     </TableCell>
                   </TableRow>
+
+                  {/* Action Buttons Row */}
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableCell className="font-medium text-muted-foreground py-6 border-t border-border">
+                      Get Started
+                    </TableCell>
+                    {Plans.map((plan) => {
+                      const isCurrent = plan.name
+                        .toLowerCase()
+                        .includes(userQuota?.tier?.toLowerCase() || "");
+                      return plan.productId !== "free-trial" ? (
+                        <TableCell
+                          key={plan.id}
+                          className="text-center py-6 border-t border-border"
+                        >
+                          {isCurrent ? (
+                            <Button
+                              variant="destructive"
+                              className="min-w-32 btn-modern light:bg-red-500 text-white hover:bg-red-600"
+                              onClick={() => handleCancelSubscription()}
+                              disabled={isCancelling}
+                            >
+                              {isCancelling ? "Cancelling..." : "Cancel"}
+                            </Button>
+                          ) : (
+                            <Button
+                              disabled={!paddle || isUpdating}
+                              onClick={() => {
+                                handleSubscribe(plan.productId);
+                              }}
+                              className={`btn-modern min-w-32 ${"bg-primary text-primary-foreground hover:bg-green-600/90"}`}
+                              variant="default"
+                            >
+                              {isUpdating ? "Updating..." : "Get started"}
+                            </Button>
+                          )}
+                        </TableCell>
+                      ) : (
+                        <TableCell key={plan.id} />
+                      );
+                    })}
+                  </TableRow>
                 </TableBody>
               </Table>
-            </div>
-
-            {/* Action buttons at bottom */}
-            <div className="grid grid-cols-4 gap-6 mt-8 pt-6 border-t border-border">
-              {plans.map((plan) => {
-                const isCurrent = plan.name
-                  .toLowerCase()
-                  .includes(userQuota?.tier?.toLowerCase() || "");
-                return (
-                  <Button
-                    key={plan.id}
-                    disabled={isCurrent || !paddle}
-                    onClick={() => {
-                      if (!isCurrent && paddle) {
-                        if (plan.productId === "free-trial") {
-                          console.log("Free plan selected");
-                        } else {
-                          handleCheckout(plan.productId);
-                        }
-                      }
-                    }}
-                    className={`btn-modern ${
-                      isCurrent
-                        ? "bg-muted text-muted-foreground cursor-not-allowed hover:bg-muted"
-                        : plan.productId === "free-trial"
-                        ? "bg-green-600 text-white hover:bg-green-700"
-                        : "bg-primary text-primary-foreground hover:bg-primary/90"
-                    }`}
-                    variant={isCurrent ? "secondary" : "default"}
-                  >
-                    {isCurrent
-                      ? "Current Plan"
-                      : plan.productId === "free-trial"
-                      ? "Start free trial"
-                      : "Get started"}
-                  </Button>
-                );
-              })}
             </div>
           </CardContent>
         </Card>

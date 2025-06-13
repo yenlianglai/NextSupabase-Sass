@@ -8,6 +8,8 @@ import Link from "next/link";
 export default function SubscriptionContent() {
   const { isLoading: isUQLoading, data: userQuota } = useUserQuota();
 
+  console.log(userQuota);
+
   return (
     <div className="space-y-6">
       <div className="mb-6">
@@ -63,7 +65,7 @@ export default function SubscriptionContent() {
                   style={{
                     width: userQuota?.threshold
                       ? `${Math.min(
-                          (userQuota.num_usages / userQuota.threshold) * 100,
+                          (userQuota.num_usages! / userQuota.threshold) * 100,
                           100
                         )}%`
                       : "0%",

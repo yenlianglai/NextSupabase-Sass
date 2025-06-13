@@ -1,19 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
-import { UserQuota } from "@/types/userQuota";
+import { UserQuota } from "@/types";
 
 export function useUserQuota() {
   return useQuery<UserQuota, Error>({
     queryKey: ["userQuota"],
     queryFn: async () => {
       const response = await fetch(`/api/userQuota`);
+
       if (!response.ok) {
-        throw new Error("User quota not found");
+        throw new Error("Failed to fetch user quota");
       }
-      const data: UserQuota = await response.json();
-      return data;
+
+      return response.json();
     },
-    staleTime: Infinity,
+    staleTime: 5 * 60 * 1000, // 5 minutes instead of Infinity
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnMount: true, // Allow refetch on mount
   });
 }

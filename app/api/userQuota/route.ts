@@ -3,36 +3,56 @@
 import { NextResponse } from "next/server";
 import { getUserQuota } from "@/queries/users";
 import { createClient } from "@/lib/supabase/server";
+import { handleError, ErrorType, ErrorSeverity } from "@/lib/errors";
 
 export async function GET() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const id = user?.id;
-
-  if (!id) {
-    return NextResponse.json(
-      { error: "Missing required query parameter: id" },
-      { status: 400 }
-    );
-  }
-
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const id = user?.id;
+
+    if (!id) {
+      const error = handleError(new Error("User not authenticated"), {
+        context: {
+          endpoint: "/api/userQuota",
+        },
+        showToast: false,
+        logError: true,
+      });
+
+      return NextResponse.json({ error: error.userMessage }, { status: 401 });
+    }
+
     const userQuota = await getUserQuota(id);
 
     if (userQuota === undefined) {
-      return NextResponse.json(
-        { error: `No user quota found` },
-        { status: 404 }
-      );
+      const error = handleError(new Error("User quota not found"), {
+        context: {
+          endpoint: "/api/userQuota",
+          userId: id,
+        },
+        showToast: false,
+        logError: true,
+      });
+
+      return NextResponse.json({ error: error.userMessage }, { status: 404 });
     }
 
     return NextResponse.json(userQuota);
   } catch (err: unknown) {
-    console.error("Error fetching user quota:", err);
+    const error = handleError(err, {
+      context: {
+        endpoint: "/api/userQuota",
+      },
+      showToast: false,
+      logError: true,
+      reportError: true,
+    });
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: error.userMessage || "Failed to fetch user quota" },
       { status: 500 }
     );
   }

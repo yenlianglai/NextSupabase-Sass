@@ -1,5 +1,5 @@
 // app/api/create-stripe-customer/route.ts
-import { getPaddleInstance } from "@/lib/paddle/utils";
+import { createPaddle } from "@/lib/paddle/utils";
 import { createServiceClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
   }
 
   // create a Paddle customer
-  const Paddle = getPaddleInstance();
+  const Paddle = createPaddle();
 
   let customer;
   try {

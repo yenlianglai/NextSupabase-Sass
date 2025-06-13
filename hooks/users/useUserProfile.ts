@@ -6,11 +6,12 @@ export function useUserProfile() {
     queryKey: ["user"],
     queryFn: async () => {
       const response = await fetch(`/api/userProfile`);
+
       if (!response.ok) {
-        throw new Error("User profile not found");
+        throw new Error("Failed to fetch user profile");
       }
-      const data: UserProfile = await response.json();
-      return data;
+
+      return response.json();
     },
     staleTime: Infinity,
     refetchOnWindowFocus: false,

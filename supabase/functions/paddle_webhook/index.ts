@@ -41,12 +41,14 @@ Deno.serve(async (req) => {
     // 5. Parse JSON payload
     const payload = JSON.parse(bodyText);
     const type = payload.event_type;
-    console.log("[Webhook] Event type:", type);
+    const status = payload.data.status;
 
-    // 6. Handle subscription events
+    console.log("[Webhook] Received event:", type, "with status:", status);
+
+    // 6. Only handle subscription events
     if (
       type === "subscription.created" ||
-      type === "subscription.updated" ||
+      (type === "subscription.updated" && status !== "canceled") || // ignore canceled updates
       type === "subscription.canceled"
     ) {
       const customerId = payload.data?.customer_id;
@@ -54,6 +56,7 @@ Deno.serve(async (req) => {
       const item = payload.data?.items?.[0];
       const tier = item?.price?.name?.toLowerCase() ?? "";
       const next_billed_at = item?.next_billed_at;
+      const currentUsage = payload?.custom_data?.currentUsage;
 
       if (!customerId || !subscription_id || !tier) {
         console.warn(
@@ -69,11 +72,11 @@ Deno.serve(async (req) => {
           ? 50
           : tier === "pro"
           ? 100
-          : tier === "enterprise"
+          : tier === "premium"
           ? 500
-          : 0;
+          : 10; // default to 10 for free trial
 
-      // 7. Initialize Supabase with service role
+      // 7. Initialize Supabase client
       const supabase = createClient(
         Deno.env.get("SUPABASE_URL") ?? "",
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -88,17 +91,35 @@ Deno.serve(async (req) => {
         }
       );
 
-      // 8. Update user_quota row
-      console.log("[Webhook] Updating user_quota for customer:", customerId);
+      // 8. Build update payload
+      const updateData: {
+        tier: string;
+        subscription_id: string | null;
+        next_billed_at: string;
+        threshold: number;
+        num_usages?: number;
+      } = {
+        tier,
+        subscription_id,
+        next_billed_at,
+        threshold,
+      };
+
+      if (type === "subscription.canceled") {
+        // reset to free tier
+        updateData.tier = "free";
+        updateData.subscription_id = null;
+        updateData.threshold = 10;
+        updateData.num_usages = 0;
+      } else {
+        // for created/updated
+        updateData.num_usages = currentUsage ?? 0;
+      }
+
+      // 9. Perform the update
       const { data, error } = await supabase
         .from("user_quota")
-        .update({
-          tier,
-          subscription_id,
-          next_billed_at,
-          num_usages: 0, // reset usage
-          threshold,
-        })
+        .update(updateData)
         .eq("customer_id", customerId)
         .select();
 
@@ -113,7 +134,7 @@ Deno.serve(async (req) => {
       console.log("[Webhook] Supabase update success:", data);
       return new Response(
         JSON.stringify({
-          message: `Profile updated successfully for customer ${customerId} with tier ${tier}`,
+          message: `Profile updated successfully for customer ${customerId} with tier ${updateData.tier}`,
         }),
         {
           headers: { "Content-Type": "application/json" },
@@ -121,14 +142,15 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 9. Other event types: ignore
+    // 10. Ignore other events
     return new Response(
       JSON.stringify({ message: `No action for event type ${type}` }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (err) {
-    // 10. Catch-all
     console.error("[Webhook] Uncaught error:", err);
     return new Response("Internal server error", { status: 500 });
   }
 });
+
+//supabase functions deploy paddle_webhook --project-ref lwwmvwssdpezpnmzuotm --no-verify-jwt

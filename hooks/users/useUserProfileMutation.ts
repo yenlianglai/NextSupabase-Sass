@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { UserProfile } from "@/types";
+import { handleError } from "@/lib/errors";
 
 const handleUpdateUserProfile = async ({
   userName,
@@ -9,23 +10,37 @@ const handleUpdateUserProfile = async ({
   userName: string;
   userProfile: UserProfile;
 }) => {
-  const supabase = createClient();
+  try {
+    const supabase = createClient();
 
-  // if (email !== userProfile.email) {
-  //   const { error: authError } = await supabase.auth.updateUser({ email });
-  //   if (authError) throw new Error(`Auth update failed: ${authError.message}`);
-  // }
+    // if (email !== userProfile.email) {
+    //   const { error: authError } = await supabase.auth.updateUser({ email });
+    //   if (authError) throw new Error(`Auth update failed: ${authError.message}`);
+    // }
 
-  if (userName !== userProfile.name) {
-    const { error: profileError } = await supabase
-      .from("profile")
-      .update({ name: userName })
-      .match({ id: userProfile.id });
+    if (userName !== userProfile.name) {
+      const { error: profileError } = await supabase
+        .from("profile")
+        .update({ name: userName })
+        .match({ id: userProfile.id });
 
-    if (profileError)
-      throw new Error(`Profile update failed: ${profileError.message}`);
+      if (profileError) {
+        throw handleError(
+          new Error(`Profile update failed: ${profileError.message}`),
+          {
+            context: {
+              userId: userProfile.id,
+              operation: "update_user_profile",
+            },
+            showToast: false,
+          }
+        );
+      }
+    }
+    return { ...userProfile, name: userName };
+  } catch (error) {
+    throw error;
   }
-  return { ...userProfile, name: userName };
 };
 
 export function useUserProfileMutation() {
@@ -45,6 +60,17 @@ export function useUserProfileMutation() {
       return { currentUserProfile };
     },
     onError: (err, variables, context) => {
+      // Use unified error handling
+      handleError(err, {
+        context: {
+          userId: variables.userProfile.id,
+          operation: "update_user_profile",
+        },
+        showToast: true,
+        fallbackMessage: "Failed to update profile. Please try again.",
+      });
+
+      // Rollback optimistic update
       queryClient.setQueryData(["user"], context?.currentUserProfile);
     },
     onSettled: () => {

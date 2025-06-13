@@ -3,6 +3,8 @@ import { Navbar } from "@/components/Navbar";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import ReactQueryProviders from "@/context/ReactQueryContext";
+import { Toaster } from "@/components/ui/sonner";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import "./globals.css";
@@ -42,30 +44,33 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <nav className="fixed top-0 left-0 right-0 h-20 glass-effect border-b border-border z-20">
-              <Navbar />
-            </nav>
+            <ErrorBoundary>
+              <nav className="fixed top-0 left-0 right-0 h-20 glass-effect border-b border-border z-20">
+                <Navbar />
+              </nav>
 
-            <main className="h-screen overflow-auto pt-20 pb-16">
-              {children}
-            </main>
+              <main className="h-screen overflow-auto pt-20 pb-16">
+                {children}
+              </main>
 
-            <footer
-              className="fixed bottom-0 left-0 right-0
-            h-16 flex items-center justify-center border-t border-border"
-            >
-              <p className="text-xs flex gap-2 text-foreground/70">
-                Powered by
-                <a
-                  href="https://supabase.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-bold hover:underline hover:text-foreground transition-colors"
-                >
-                  Supabase
-                </a>
-              </p>
-            </footer>
+              <footer
+                className="fixed bottom-0 left-0 right-0
+              h-16 flex items-center justify-center border-t border-border"
+              >
+                <p className="text-xs flex gap-2 text-foreground/70">
+                  Powered by
+                  <a
+                    href="https://supabase.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-bold hover:underline hover:text-foreground transition-colors"
+                  >
+                    Supabase
+                  </a>
+                </p>
+              </footer>
+            </ErrorBoundary>
+            <Toaster />
           </ThemeProvider>
         </ReactQueryProviders>
       </body>
