@@ -37,10 +37,11 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*.localgit push -u origin main
-.env
+.env*
 .env.development
 .env.production
+.env.test
+!.env.example
 
 # vercel
 .vercel
@@ -80,4 +81,3 @@ logs
 # Temporary folders
 tmp/
 temp/
-.env.local

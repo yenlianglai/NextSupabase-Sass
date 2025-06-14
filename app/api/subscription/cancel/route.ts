@@ -1,6 +1,6 @@
 import { createPaddle } from "@/lib/paddle/utils";
 import { NextRequest, NextResponse } from "next/server";
-import { handleError, ErrorType, ErrorSeverity } from "@/lib/errors";
+import { handleError } from "@/lib/errors";
 
 export async function POST(request: NextRequest) {
   try {

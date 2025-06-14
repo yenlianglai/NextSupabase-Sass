@@ -3,7 +3,7 @@
 import { NextResponse } from "next/server";
 import { getUserQuota } from "@/queries/users";
 import { createClient } from "@/lib/supabase/server";
-import { handleError, ErrorType, ErrorSeverity } from "@/lib/errors";
+import { handleError } from "@/lib/errors";
 
 export async function GET() {
   try {
