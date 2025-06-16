@@ -8,8 +8,6 @@ import Link from "next/link";
 export default function SubscriptionContent() {
   const { isLoading: isUQLoading, data: userQuota } = useUserQuota();
 
-  console.log(userQuota);
-
   return (
     <div className="space-y-6">
       <div className="mb-6">

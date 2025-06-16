@@ -28,7 +28,7 @@ const PLAN_THRESHOLDS: PlanThresholds = {
   free: 10,
 };
 
-export function useUserQuotaMutation() {
+export function useSubscriptionMutation() {
   const queryClient = useQueryClient();
 
   const cancelSubscriptionMutation = useMutation({
@@ -100,7 +100,6 @@ export function useUserQuotaMutation() {
       }, 3000); // Wait 3 seconds for webhook to process
     },
     onError: (error, variables, context) => {
-      // Use unified error handling
       handleError(error, {
         context: {
           subscriptionId: variables.subscriptionId || undefined,

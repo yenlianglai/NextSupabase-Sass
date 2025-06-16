@@ -1,7 +1,6 @@
 // app/api/userProfile/route.ts
 
 import { NextResponse } from "next/server";
-import { getUserQuota } from "@/queries/users";
 import { createClient } from "@/lib/supabase/server";
 import { handleError } from "@/lib/errors";
 
@@ -25,9 +24,13 @@ export async function GET() {
       return NextResponse.json({ error: error.userMessage }, { status: 401 });
     }
 
-    const userQuota = await getUserQuota(id);
+    const { data, error } = await supabase
+      .from("user_quota")
+      .select("*")
+      .eq("id", id)
+      .single();
 
-    if (userQuota === undefined) {
+    if (!data) {
       const error = handleError(new Error("User quota not found"), {
         context: {
           endpoint: "/api/userQuota",
@@ -38,9 +41,23 @@ export async function GET() {
       });
 
       return NextResponse.json({ error: error.userMessage }, { status: 404 });
+    } else if (error) {
+      const e = handleError(error, {
+        context: {
+          endpoint: "/api/userQuota",
+          userId: id,
+        },
+        showToast: false,
+        logError: true,
+        reportError: true,
+      });
+      return NextResponse.json(
+        { error: e.userMessage || "Failed to fetch user quota" },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json(userQuota);
+    return NextResponse.json(data);
   } catch (err: unknown) {
     const error = handleError(err, {
       context: {
