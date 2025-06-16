@@ -73,7 +73,7 @@ export default function SubscriptionContent() {
             </div>
           </Row>
 
-          <Row label="Billing Cycle">
+          <Row label="Next Billing Date">
             {userQuota?.next_billed_at ? (
               <span className="text-foreground/80 font-medium">
                 {new Date(userQuota.next_billed_at).toLocaleDateString(

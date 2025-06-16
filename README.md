@@ -64,101 +64,24 @@ yarn install
 pnpm install
 ```
 
-### 3. Environment Setup
+### 3. Dev Environment Setup
 
-Copy the environment variables template:
+download supabase cli
 
-```bash
-cp .env.example .env.local
+#### 1. Start supabase locally
+
+```
+supabase start
+supabase db reset
 ```
 
-Update `.env.local` with your Supabase credentials:
+Update `.env.development` with your Supabase credentials:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_API_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-DATABASE_URL=postgres_url
-NEXT_PUBLIC_PADDLE_ENV=sandbox_or_production
-NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=client_side_token_for_paddle
-PADDLE_WEBHOOK_SECRET_KEY=webhook_secret_to_listen_to_paddle_notification
-PADDLE_API_KEY=server_side_api_key_for_paddle
-API_ROUTE_SECRET=weobhook_secrete_for_supabase_trigger_function
-```
-
-### 4. Start Supabase Locally (Optional)
-
-For local development with Supabase:
-
-```bash
-# Start Supabase services
-supabase start
-
-# This will provide you with local URLs and keys
-# Update your .env.local with the local credentials
-```
-
-### 5. Database Setup
-
-Run migrations and seed data with drizzle-kit:
-
-```bash
-npm run generate
-
-npm run migrate
-
-```
-
-### 6. Start the Development Server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## 📦 Available Scripts
-
-```bash
-# Development
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-
-# Supabase
-supabase start       # Start local Supabase
-supabase stop        # Stop local Supabase
-supabase status      # Check Supabase status
-supabase db reset    # Reset local database
-supabase gen types   # Generate TypeScript types
-```
-
-## 🗄️ Database & Supabase
-
-### Key Features
-
-- **Authentication**: Built-in auth with email/password, OAuth providers
-- **Real-time subscriptions**: Live data updates
-- **Row Level Security (RLS)**: Secure data access
-- **Edge Functions**: Serverless functions
-- **Storage**: File uploads and management
-
-### Database Schema
-
-The project includes:
-
-- `users` table with profile information
-- Authentication tables (managed by Supabase)
-- Custom tables for your application data
-
-### Generating Types
-
-To generate TypeScript types from your Supabase schema:
-
-```bash
-npx supabase gen types typescript --project-id "lwwmvwssdpezpnmzuotm" --schema public > types/database.types.ts
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+DATABASE_URL=your_supabase_DB_URL
 ```
 
 ## 🔐 Authentication
@@ -175,7 +98,3 @@ The project includes:
 - **Tailwind CSS** for utility-first styling
 - **CSS Modules** support
 - **Component-based** styling approach
-
-## 📁 Key Directories
-
-## 🧪 Testing
