@@ -1,100 +1,153 @@
-# Next.js + Supabase Project
+# Essay Auditor - AI-Powered Writing Analysis Platform
 
-A modern full-stack application built with Next.js and Supabase, featuring authentication, real-time data, and a clean project structure.
+A comprehensive SaaS platform built with Next.js and Supabase that provides AI-powered essay analysis and feedback for students preparing for standardized tests like TOEFL and IELTS.
 
-## 🚀 Project Structure
+## ✨ Features
+
+### 🎯 Core Functionality
+
+- **AI-Powered Essay Analysis** - Comprehensive feedback on grammar, vocabulary, coherence, and structure
+- **Exam-Specific Guidance** - Tailored feedback for TOEFL, IELTS, and other standardized tests
+- **Real-time Grading** - Instant scoring and detailed analysis reports
+- **Writing Progress Tracking** - Monitor improvement over time with detailed analytics
+
+### 🔐 Authentication & User Management
+
+- Complete authentication system with Supabase Auth
+- Protected routes with middleware-based session management
+- User profiles with customizable settings
+- Social authentication support (Google, etc.)
+
+### 💳 Subscription Management
+
+- **Paddle Integration** - Secure payment processing
+- **Flexible Pricing Tiers** - Multiple subscription plans with different quotas
+- **Real-time Subscription Updates** - Instant plan changes and cancellations
+- **Usage Quotas** - Track and limit essay submissions based on plan
+
+### 🎨 Modern UI/UX
+
+- **Dark/Light Mode** - Full theme switching support
+- **Responsive Design** - Optimized for desktop, tablet, and mobile
+- **Component Library** - Built with Radix UI and Tailwind CSS
+- **Toast Notifications** - Real-time user feedback with Sonner
+
+## 🏗️ Architecture & Tech Stack
+
+### Frontend
+
+- **Next.js 15** - App Router with React 19
+- **TypeScript** - Full type safety
+- **Tailwind CSS** - Utility-first styling
+- **Radix UI** - Accessible component primitives
+- **TanStack Query** - Server state management
+- **Lucide React** - Beautiful icons
+
+### Backend & Database
+
+- **Supabase** - PostgreSQL database with real-time subscriptions
+- **Drizzle ORM** - Type-safe database queries
+- **Next.js API Routes** - Server-side logic
+- **Edge Runtime** - Optimized performance
+
+### Payment & Analytics
+
+- **Paddle** - Subscription billing and payments
+- **Webhook Handlers** - Automated subscription management
+
+## 📁 Project Structure
 
 ```
-next-supabase/
-├── app/                    # Next.js 13+ App Router
-│   ├── (auth)/            # Auth route group
-│   ├── dashboard/         # Protected dashboard pages
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Home page
-├── components/            # Reusable React components
-│   ├── ui/               # UI components (buttons, forms, etc.)
-│   └── layout/           # Layout components (header, footer, etc.)
-├── lib/                  # Utility functions and configurations
-│   ├── supabase/         # Supabase client and utilities
-│   ├── utils.ts          # General utility functions
-│   └── validations.ts    # Form validation schemas
-├── types/                # TypeScript type definitions
-├── public/               # Static assets
-├── supabase/            # Supabase configuration
-│   ├── config.toml      # Supabase CLI configuration
-│   ├── migrations/      # Database migrations
-│   └── seed.sql         # Database seed data
-├── .env.local           # Environment variables (local)
-├── .env.example         # Environment variables template
-└── package.json         # Dependencies and scripts
+├── app/                     # Next.js 15 App Router
+│   ├── api/                # API routes
+│   │   ├── subscription/   # Subscription management
+│   │   ├── userProfile/    # User profile endpoints
+│   │   ├── userQuota/      # Usage quota tracking
+│   │   └── webhook/        # Payment webhooks
+│   ├── auth/               # Authentication pages
+│   ├── essay-auditor/      # Main application pages
+│   │   ├── exam-hall/      # Essay submission interface
+│   │   ├── grading/        # Analysis results
+│   │   ├── results/        # Historical results
+│   │   └── topic/          # Essay topics
+│   ├── pricing/            # Subscription plans
+│   └── protected/          # Protected user dashboard
+├── components/             # Reusable React components
+│   ├── ui/                # UI component library
+│   └── Navbar/            # Navigation components
+├── db/                    # Database schema and configuration
+├── lib/                   # Utilities and configurations
+│   ├── supabase/          # Supabase client setup
+│   ├── paddle/            # Payment integration
+│   └── errors/            # Error handling
+├── hooks/                 # Custom React hooks
+├── types/                 # TypeScript type definitions
+└── supabase/             # Database migrations and functions
 ```
 
-## 🛠️ Prerequisites
+## Getting Started
 
-Before you begin, ensure you have the following installed:
+### Prerequisites
 
-- **Node.js** (v18 or higher)
-- **npm** or **yarn** or **pnpm**
-- **Supabase CLI** (for local development)
+- **Bun** (recommended) or **Node.js** 18+
+- **Supabase CLI** for local development
+- **Paddle Account** for payment processing
 
-### Install Supabase CLI
+### Installation
 
-````bash
-# macOS
-brew install supabase/tap/supabase
-
-
-## 🏃‍♂️ Getting Started
-
-### 1. Clone the Repository
+1. **Clone the repository**
 
 ```bash
-git clone <your-repo-url>
+git clone <repository-url>
 cd next-supabase
-````
+```
 
-### 2. Install Dependencies
+2. **Install dependencies**
 
 ```bash
+bun install
+# or
 npm install
-# or
-yarn install
-# or
-pnpm install
 ```
 
-### 3. Dev Environment Setup
+3. **Set up Supabase locally**
 
-download supabase cli
+prerequisite: download supabase cli
+https://supabase.com/docs/guides/local-development
 
-#### 1. Start supabase locally
-
-```
+```bash
 supabase start
+supabase link
 supabase db reset
 ```
 
-Update `.env.development` with your Supabase credentials:
+4. **Configure environment variables for local development**
+
+1. Create `.env.development`:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_API_URL
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-DATABASE_URL=your_supabase_DB_URL
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Database
+DATABASE_URL=your_database_url
 ```
 
-## 🔐 Authentication
+2. (Optional) Create `/supabse/.env` to use auth locally:
 
-The project includes:
+```env
+SUPABASE_AUTH_GOOGLE_CLIENT_ID=your_google_oauth2.0_client_id
+SUPABASE_AUTH_GOOGLE_SECRET=your_google_oauth2.0_secret
+```
 
-- Sign up / Sign in forms
-- Protected routes
-- User session management
-- OAuth providers (configurable)
+3. **Run the development server**
 
-## 🎨 Styling
+```bash
+bun dev
+# or
+npm run dev
+```
 
-- **Tailwind CSS** for utility-first styling
-- **CSS Modules** support
-- **Component-based** styling approach
+Visit [http://localhost:3000](http://localhost:3000) to see the application.
