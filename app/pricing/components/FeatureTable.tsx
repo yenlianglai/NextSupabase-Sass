@@ -199,9 +199,7 @@ export function FeatureTable({ plans }: FeatureTableProps) {
                             : "bg-primary text-primary-foreground hover:bg-green-600/90"
                         }`}
                         onClick={() =>
-                          isCurrent
-                            ? onCancel()
-                            : onSubscribe(plan.productId, plan.name)
+                          isCurrent ? onCancel() : onSubscribe(plan.productId)
                         }
                         disabled={!paddleReady || isLoading}
                       >

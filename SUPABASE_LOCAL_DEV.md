@@ -1,6 +1,7 @@
 ### Seed the local supabase
 
 prerequisite: download supabase cli
+https://supabase.com/docs/guides/local-development
 
 supabase start
 supabase link
@@ -8,5 +9,5 @@ supabase link
 ### sync with remote project
 
 supabase db diff -f initial_structure --linked
-supabase db dump --data-only --linked -f supabase/seed.sql
+supabase db pull --schema auth
 supabase db reset

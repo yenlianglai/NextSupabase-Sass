@@ -1,36 +1,40 @@
 import { AuthButton } from "@/components/Navbar/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import Link from "next/link";
+import { LogoButton } from "@/components/Navbar/logo-button";
+import { NavLinks } from "@/components/Navbar/nav-links";
+import { PenTool, Play, DollarSign } from "lucide-react";
 
 export const Navbar = () => {
+  const navLinks = [
+    {
+      href: "/essay-auditor",
+      icon: <PenTool className="w-4 h-4" />,
+      label: "About",
+    },
+    {
+      href: "/essay-auditor/exam-hall",
+      label: "Start",
+      icon: <Play className="w-4 h-4" />,
+    },
+    {
+      href: "/pricing",
+      label: "Pricing",
+      icon: <DollarSign className="w-4 h-4" />,
+    },
+  ];
+
   return (
-    <div className="h-full flex justify-between items-center p-5 text-sm">
-      <div className="flex items-center justify-start gap-20">
-        <Link href="/" className="font-bold text-lg gradient-text">
-          LOGO
-        </Link>
-        <Link
-          href="/products"
-          className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
-        >
-          Products
-        </Link>
-        <Link
-          href="/about"
-          className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
-        >
-          About
-        </Link>
-        <Link
-          href="/pricing"
-          className="text-foreground hover:text-primary transition-colors duration-200 font-medium"
-        >
-          Pricing
-        </Link>
+    <div className="h-full flex justify-between items-center px-6 py-4 backdrop-blur-md">
+      {/* Left section */}
+      <div className="flex items-center gap-12">
+        <LogoButton />
+        <NavLinks links={navLinks} />
       </div>
 
-      <div className="flex justify-end gap-5 items-center">
+      {/* Right section */}
+      <div className="flex items-center gap-4">
         <AuthButton />
+        <div className="w-px h-6 bg-border dark:bg-border/60" />
         <ThemeSwitcher />
       </div>
     </div>

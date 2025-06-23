@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
 export function Hero() {
   return (
     <div className="min-h-[80vh] flex flex-col gap-16 items-center justify-center pricing-hero px-4">
@@ -9,7 +12,7 @@ export function Hero() {
         <h2 className="text-5xl lg:text-6xl font-bold mb-6 gradient-text">
           Build Modern Apps Faster
         </h2>
-        <p className="text-xl lg:text-2xl !leading-tight mx-auto max-w-3xl text-muted-foreground">
+        <p className="text-xl lg:text-2xl !leading-tight mx-auto max-w-3xl text-muted-foreground mb-8">
           The fastest way to build apps with{" "}
           <a
             href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
@@ -29,6 +32,23 @@ export function Hero() {
             Next.js
           </a>
         </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <Link href="/essay-auditor">
+            <Button size="lg" className="px-8 py-4 h-14 text-lg">
+              Try Essay Auditor
+            </Button>
+          </Link>
+          <Link href="/protected">
+            <Button
+              size="lg"
+              variant="outline"
+              className="px-8 py-4 h-14 text-lg"
+            >
+              Go to Dashboard
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

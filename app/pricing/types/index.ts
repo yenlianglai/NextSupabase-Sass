@@ -17,7 +17,7 @@ export interface PricingState {
 }
 
 export interface PricingActions {
-  onSubscribe: (planProductId: string, planName: string) => Promise<void>;
+  onSubscribe: (planProductId: string) => Promise<void>;
   onCancel: () => Promise<void>;
 }
 

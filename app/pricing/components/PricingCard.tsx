@@ -25,7 +25,7 @@ export function PricingCard({ plan }: PricingCardProps) {
     if (isCurrent) {
       onCancel();
     } else {
-      onSubscribe(plan.productId, plan.name);
+      onSubscribe(plan.productId);
     }
   };
 

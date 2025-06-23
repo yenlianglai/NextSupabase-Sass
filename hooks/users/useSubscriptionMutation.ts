@@ -41,7 +41,7 @@ export function useSubscriptionMutation() {
           },
           body: JSON.stringify({
             subscriptionId: data.subscriptionId,
-            effectiveFrom: data.effectiveFrom || "immediately",
+            effectiveFrom: data.effectiveFrom || "next_billing_period",
           }),
         });
 

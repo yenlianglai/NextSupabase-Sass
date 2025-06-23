@@ -55,18 +55,17 @@ export default function RootLayout({
 
               <footer
                 className="fixed bottom-0 left-0 right-0
-              h-16 flex items-center justify-center border-t border-border"
+              h-16 flex items-center justify-between border-t border-border"
               >
-                <p className="text-xs flex gap-2 text-foreground/70">
-                  Powered by
-                  <a
-                    href="https://supabase.com"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-bold hover:underline hover:text-foreground transition-colors"
-                  >
-                    Supabase
-                  </a>
+                <div className="flex items-center space-x-3 mb-4 sm:mb-0">
+                  <div className="h-8 w-8 rounded-lg bg-primary"></div>
+                  <span className="text-lg font-semibold text-foreground">
+                    Essay Auditor
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  © {new Date().getFullYear()} Essay Auditor. All rights
+                  reserved.
                 </p>
               </footer>
             </ErrorBoundary>

@@ -48,7 +48,7 @@ export function usePaddle(): UsePaddleReturn {
         displayMode: "overlay",
         theme: "light",
         locale: "en",
-        successUrl: `${window.location.origin}/pricing/`,
+        successUrl: `${window.location.origin}/protected`,
       },
       items: [
         {

@@ -42,6 +42,7 @@ export const PricingProvider: React.FC<PricingProviderProps> = ({
   children,
 }) => {
   const { data: userQuota } = useUserQuota();
+
   const { cancelSubscription, updateSubscription, isCancelling, isUpdating } =
     useConditionalSubscriptionMutation();
   const { isReady: paddleReady, createSubscription } = useConditionalPaddle();
@@ -55,11 +56,11 @@ export const PricingProvider: React.FC<PricingProviderProps> = ({
   );
 
   const handleSubscribe = useCallback(
-    async (planProductId: string, planName: string) => {
+    async (planProductId: string) => {
       if (!userQuota) return;
 
       if (userQuota.tier === "free") {
-        createSubscription(planProductId, userQuota.customer_id!);
+        createSubscription(planProductId, userQuota.id!);
       } else {
         updateSubscription({
           subscriptionId: userQuota.subscription_id!,
@@ -67,7 +68,6 @@ export const PricingProvider: React.FC<PricingProviderProps> = ({
           quantity: 1,
           prorationBillingMode: "prorated_next_billing_period",
           currentUsage: userQuota.num_usages || 0,
-          newTier: planName.toLowerCase(),
         });
       }
     },
@@ -79,7 +79,7 @@ export const PricingProvider: React.FC<PricingProviderProps> = ({
 
     cancelSubscription({
       subscriptionId: userQuota.subscription_id,
-      effectiveFrom: "immediately",
+      effectiveFrom: "next_billing_period",
     });
   }, [userQuota?.subscription_id, cancelSubscription]);
 
