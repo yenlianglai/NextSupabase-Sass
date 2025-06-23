@@ -117,8 +117,6 @@ https://supabase.com/docs/guides/local-development
 
 ```bash
 supabase start
-supabase link
-supabase db reset
 ```
 
 4. **Configure environment variables for local development**
