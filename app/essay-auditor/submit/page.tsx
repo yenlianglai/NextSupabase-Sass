@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { mockTopics, Topic } from "@/data/mock-topics";
@@ -185,7 +185,7 @@ const WritingArea = ({
   );
 };
 
-export default function Submit() {
+function SubmitContent() {
   const searchParams = useSearchParams();
   const topicId = searchParams.get("topic");
 
@@ -231,5 +231,19 @@ export default function Submit() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Submit() {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-full bg-background flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
+      <SubmitContent />
+    </Suspense>
   );
 }
